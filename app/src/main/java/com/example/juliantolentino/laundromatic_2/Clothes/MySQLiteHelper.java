@@ -1,11 +1,13 @@
-package com.example.juliantolentino.laundromatic_2.Clothes;
+package com.example.juliantolentino.laundromatic_2;
 
 /**
  * Created by Robert on 3/14/2015.
  */
+import android.content.ContentValues;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
 
 public class MySQLiteHelper extends SQLiteOpenHelper {
 
@@ -62,21 +64,32 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
     private static final String KEY_NAME = "name";
     private static final String KEY_TIMESWORN = "timesWorn";
     private static final String KEY_PRICE = "price";
-    
-    private static final String[] COLUMNS = {KEY_ID, KEY_TYPE, KEY_COLOR};
+    private static final String KEY_LASTWORN = "lastWorn";
+    private static final String KEY_SWEATVALUE = "sweatValue";
+    private static final String KEY_WASHING = "washing";
+    private static final String KEY_DRYING = "drying";
 
-    public void addClothing(Book clothing){
+    private static final String[] COLUMNS = {KEY_ID, KEY_TYPE, KEY_COLOR, KEY_NAME, KEY_TIMESWORN, KEY_PRICE, KEY_LASTWORN, KEY_SWEATVALUE, KEY_WASHING, KEY_DRYING};
+
+    public void addClothing(Clothing clothing){
         Log.d("addClothing", clothing.toString());
         // 1. get reference to writable DB
         SQLiteDatabase db = this.getWritableDatabase();
 
         // 2. create ContentValues to add key "column"/value
         ContentValues values = new ContentValues();
-        values.put(KEY_TYPE, clothing.getTitle()); // get title
-        values.put(KEY_COLOR, clothing.getAuthor()); // get author
+        values.put(KEY_TYPE, clothing.getType()); // get type
+        values.put(KEY_COLOR, clothing.getColor()); // get color
+        values.put(KEY_NAME, clothing.getName());
+        values.put(KEY_TIMESWORN, clothing.getTimesWorn());
+        values.put(KEY_PRICE, clothing.getPrice());
+        values.put(KEY_LASTWORN, clothing.getLastWorn());
+        values.put(KEY_SWEATVALUE, clothing.getSweatValue());
+        values.put(KEY_WASHING, clothing.getWashing());
+        values.put(KEY_DRYING, clothing.getDrying());
 
         // 3. insert
-        db.insert(TABLE_BOOKS, // table
+        db.insert(TABLE_CLOTHES, // table
                 null, //nullColumnHack
                 values); // key/value -> keys = column names/ values = column values
 
@@ -84,14 +97,14 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
         db.close();
     }
 
-    public Book getBook(int id){
+    public Clothing getClothing(int id){
 
         // 1. get reference to readable DB
         SQLiteDatabase db = this.getReadableDatabase();
 
         // 2. build query
         Cursor cursor =
-                db.query(TABLE_BOOKS, // a. table
+                db.query(TABLE_CLOTHES, // a. table
                         COLUMNS, // b. column names
                         " id = ?", // c. selections
                         new String[] { String.valueOf(id) }, // d. selections args
@@ -105,64 +118,85 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
             cursor.moveToFirst();
 
         // 4. build book object
-        Book book = new Book();
-        book.setId(Integer.parseInt(cursor.getString(0)));
-        book.setTitle(cursor.getString(1));
-        book.setAuthor(cursor.getString(2));
+        Clothing clothing = new Book();
+        clothing.setId(Integer.parseInt(cursor.getString(0)));
+        clothing.setType(Integer.parseInt(cursor.getString(1)));
+        clothing.setColor(Integer.parseInt(cursor.getString(2)));
+        clothing.setName(cursor.getString(3));
+        clothing.setTimesWorn(Integer.parseInt(cursor.getString(4)));
+        clothing.setPrice(cursor.getString(5));
+        clothing.setLastWorn(cursor.getString(6));
+        clothing.setSweatValue(Integer.parseInt(cursor.getString(7)));
+        clothing.setWashing(Integer.parseInt(cursor.getString(8)));
+        clothing.setDrying(Integer.parseInt(cursor.getString(9)));
 
-        Log.d("getBook("+id+")", book.toString());
+        Log.d("getClothing(" + id + ")", clothing.toString());
 
         // 5. return book
-        return book;
+        return clothing;
     }
 
     // Get All Books
-    public List<Book> getAllBooks() {
-        List<Book> books = new LinkedList<Book>();
+    public List<Clothing> getAllBooks() {
+        List<Clothing> clothes = new LinkedList<Clothing>();
 
         // 1. build the query
-        String query = "SELECT  * FROM " + TABLE_BOOKS;
+        String query = "SELECT  * FROM " + TABLE_CLOTHES;
 
         // 2. get reference to writable DB
         SQLiteDatabase db = this.getWritableDatabase();
         Cursor cursor = db.rawQuery(query, null);
 
         // 3. go over each row, build book and add it to list
-        Book book = null;
+        Clothing clothing = null;
         if (cursor.moveToFirst()) {
             do {
-                book = new Book();
-                book.setId(Integer.parseInt(cursor.getString(0)));
-                book.setTitle(cursor.getString(1));
-                book.setAuthor(cursor.getString(2));
+                clothing = new Clothing();
+                clothing.setId(Integer.parseInt(cursor.getString(0)));
+                clothing.setType(Integer.parseInt(cursor.getString(1)));
+                clothing.setColor(Integer.parseInt(cursor.getString(2)));
+                clothing.setName(cursor.getString(3));
+                clothing.setTimesWorn(Integer.parseInt(cursor.getString(4)));
+                clothing.setPrice(cursor.getString(5));
+                clothing.setLastWorn(cursor.getString(6));
+                clothing.setSweatValue(Integer.parseInt(cursor.getString(7)));
+                clothing.setWashing(Integer.parseInt(cursor.getString(8)));
+                clothing.setDrying(Integer.parseInt(cursor.getString(9)));
 
                 // Add book to books
-                books.add(book);
+                clothes.add(clothing);
             } while (cursor.moveToNext());
         }
 
-        Log.d("getAllBooks()", books.toString());
+        Log.d("getAllClothes()", clothes.toString());
 
         // return books
-        return books;
+        return clothes;
     }
 
     // Updating single book
-    public int updateBook(Book book) {
+    public int updateClothing(Clothing clothing) {
 
         // 1. get reference to writable DB
         SQLiteDatabase db = this.getWritableDatabase();
 
         // 2. create ContentValues to add key "column"/value
         ContentValues values = new ContentValues();
-        values.put("title", book.getTitle()); // get title
-        values.put("author", book.getAuthor()); // get author
+        values.put("type", clothing.getType()); // get type
+        values.put("color", clothing.getColor()); // get color
+        values.put("name", clothing.getName());
+        values.put("timesWorn", clothing.getTimesWorn());
+        values.put("price", clothing.getPrice());
+        values.put("lastWorn", clothing.getLastWorn());
+        values.put("sweatValue", clothing.getSweatValue());
+        values.put("washing", clothing.getWashing());
+        values.put("drying", clothing.getDrying());
 
         // 3. updating row
-        int i = db.update(TABLE_BOOKS, //table
+        int i = db.update(TABLE_CLOTHES, //table
                 values, // column/value
                 KEY_ID+" = ?", // selections
-                new String[] { String.valueOf(book.getId()) }); //selection args
+                new String[] { String.valueOf(clothing.getId()) }); //selection args
 
         // 4. close
         db.close();
@@ -172,20 +206,20 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
     }
 
     // Deleting single book
-    public void deleteBook(Book book) {
+    public void deleteClothing(Clothing clothing) {
 
         // 1. get reference to writable DB
         SQLiteDatabase db = this.getWritableDatabase();
 
         // 2. delete
-        db.delete(TABLE_BOOKS,
+        db.delete(TABLE_CLOTHES,
                 KEY_ID+" = ?",
-                new String[] { String.valueOf(book.getId()) });
+                new String[] { String.valueOf(clothing.getId()) });
 
         // 3. close
         db.close();
 
-        Log.d("deleteBook", book.toString());
+        Log.d("deleteClothing", clothing.toString());
 
     }
 }

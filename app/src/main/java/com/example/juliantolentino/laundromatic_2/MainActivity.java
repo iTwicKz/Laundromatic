@@ -6,6 +6,11 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import java.util.List;
+import com.hmkcode.android.model.Book;
+import com.hmkcode.android.sqlite.MySQLiteHelper;
+import android.os.Bundle;
+import android.app.Activity;
 
 import com.example.juliantolentino.laundromatic_2.Clothes.Clothes;
 
@@ -15,6 +20,8 @@ import java.util.ArrayList;
 public class MainActivity extends ActionBarActivity {
 
     ArrayList<Clothes> clothesList;
+    MySQLiteHelper closet = new MySQLiteHelper(this);
+    MySQLiteHelper hamper = new MySQLiteHelper(this);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
